@@ -19,6 +19,8 @@ import tarfile
 import tempfile
 import urllib2
 import zipfile
+import ssl
+
 
 VARS = {}
 
@@ -235,7 +237,11 @@ def textfile(*lines):
 def download(url, name):
   info('download "%s" to "%s"', url, topdir(name))
 
-  u = urllib2.urlopen(url)
+  ctx = ssl.create_default_context()
+  ctx.check_hostname = False
+  ctx.verify_mode = ssl.CERT_NONE
+
+  u = urllib2.urlopen(url, context=ctx)
   meta = u.info()
   try:
     size = int(meta.getheaders('Content-Length')[0])
